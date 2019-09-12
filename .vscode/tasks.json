@@ -1,0 +1,11 @@
+{
+    "version": "1.0.0",
+    "tasks": [
+        {
+            "label": "pypi build",
+            "type": "shell",
+            "command": "rm dist/ -r | python3 setup.py sdist bdist_wheel",
+            "problemMatcher": []
+        }
+    ]
+}
