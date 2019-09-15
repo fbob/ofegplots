@@ -7,11 +7,11 @@ on:
 
 
 jobs:
-  if: startsWith(github.event.ref, 'refs/tags')
   build:
 
     runs-on: ubuntu-latest
-    
+    if: startsWith(github.event.ref, 'refs/tags')
+
     steps:
     - uses: actions/checkout@v1
     - name: Publish a Python distribution to PyPI
