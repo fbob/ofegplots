@@ -1,10 +1,11 @@
 name: Publish ofegplots to pypi
 
-on: push
-  branches:
-    - master
-  tags:
-    - v*
+on: 
+  push:
+    branches:
+      - master
+    tags:
+      - v*
 
 jobs:
   build:
