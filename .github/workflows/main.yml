@@ -7,6 +7,7 @@ on:
 
 
 jobs:
+  if: startsWith(github.event.ref, 'refs/tags')
   build:
 
     runs-on: ubuntu-latest
@@ -14,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Publish a Python distribution to PyPI
-      if: startsWith(github.event.ref, 'refs/tags')
+      #if: startsWith(github.event.ref, 'refs/tags')
       uses:  pypa/gh-action-pypi-publish@master
       with:
         user: uqyge
