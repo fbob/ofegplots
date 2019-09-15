@@ -1,10 +1,11 @@
 name: Publish ofegplots to pypi
 
-on: push
-  branches:
-    - master
-  tags:
-    - v*
+on: 
+  push:
+    branches:
+      - master
+    tags:
+      - v*
 
 jobs:
   build:
@@ -12,8 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+    - uses: actions/checkout@v1
     - name: Publish a Python distribution to PyPI
-      # if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+      if: startsWith(github.event.ref, 'refs/tags')
       uses:  pypa/gh-action-pypi-publish@master
       with:
         user: uqyge
