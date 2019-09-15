@@ -1,5 +1,4 @@
-# ODENet model for combustion 
-
+# ofegplots for OpenFOAM postprocessing
 ODENetMoel example
 ```
 from ODENet import ODENetModel
