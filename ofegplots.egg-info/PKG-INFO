@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: ofegplots
-Version: 0.0.2
+Version: 0.0.3
 Summary: OpenFOAM postprocessing using pyvista and matplotlib
 Home-page: https://github.com/uqyge/ODENet
 Author: Y.Ge
