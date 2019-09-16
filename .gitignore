@@ -1,2 +1,2 @@
-/build/*
-/ofegplots.egg-inof/*
+build/
+ofegplots.egg-info/
