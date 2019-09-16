@@ -1,4 +1,4 @@
-name: Publish ofegplots to pypi
+name: Pypi ofegplots
 
 on:
   push:

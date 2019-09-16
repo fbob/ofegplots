@@ -75,7 +75,8 @@ def calc_ct(df, gas):
     return df_ct
 
 
-def euler_pred(df, gas):
+def euler_pred(df, gas, model_file=""):
+    # model_file = "eulerModel_sk_02new.h5"
     *input_species, _ = gas.species_names
     # input_species = gas.species_names
     # input_features = input_species + ["Hs", "Temp", "dt"]
@@ -83,7 +84,7 @@ def euler_pred(df, gas):
     input_features = input_species + ["Temp", "dt"]
     # model = tf.keras.models.load_model("eulerModel_sk_04.h5")
     # model = tf.keras.models.load_model("eulerModel_sk_02.h5")
-    model = tf.keras.models.load_model("eulerModel_sk_02new.h5")
+    model = tf.keras.models.load_model(model_file)
 
     pred = model.predict(df[input_features], batch_size=1024 * 8)
 

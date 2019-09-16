@@ -11,9 +11,9 @@ setuptools.setup(
     description="OpenFOAM postprocessing using pyvista and matplotlib",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/uqyge/ODENet",
+    url="https://github.com/uqyge/ofegplots",
     packages=setuptools.find_packages(),
-    install_requires=["pyvista", "matplotlib"],
+    install_requires=["pyvista", "matplotlib", "cantera"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
