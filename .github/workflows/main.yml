@@ -3,17 +3,15 @@ name: Publish ofegplots to pypi
 on:
   push:
 
-
 jobs:
   build:
     runs-on: ubuntu-latest
     #if: startsWith(github.event.ref, 'refs/tags')
 
     steps:
-      #if: startsWith(github.event.ref, 'refs/tags')
-      - uses: actions/checkout@v1
       - name: test
         run: echo ${{github.event.ref}}
+      - uses: actions/checkout@v1
       - name: Publish a Python distribution to PyPI
         uses: pypa/gh-action-pypi-publish@master
         if: startsWith(github.ref, 'refs/tags')
