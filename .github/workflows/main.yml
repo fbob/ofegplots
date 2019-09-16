@@ -2,8 +2,7 @@ name: Publish ofegplots to pypi
 
 on:
   push:
-    branches:
-      - master
+
 
 jobs:
   build:
