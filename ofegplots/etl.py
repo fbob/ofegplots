@@ -1,10 +1,10 @@
 import multiprocessing as mp
 
+import cantera as ct
 import numpy as np
 import pandas as pd
 import tensorflow as tf
 from molmass import Formula
-import cantera as ct
 
 
 def read_of(xy, gas):
@@ -33,17 +33,25 @@ def read_of(xy, gas):
     return df
 
 
-def calc_ct(df, gas):
-    def ct_calc(test):
+class ct_chem:
+    gas = "gas"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    @classmethod
+    def ct_calc(cls, test):
         # *test, gas = data_in
-        reaction_mechanism = "/home/edison/OpenFOAM/flameD/data/smooke.cti"
-        gas = ct.Solution(reaction_mechanism)
-        Y = []
-        # for sp in species:
-        for sp in gas.species_names:
-            Y_sp = test[sp + "_Y"]
-            Y.append(Y_sp)
-        Y = np.asarray(Y).reshape(1, -1)
+        # reaction_mechanism = "/home/edison/OpenFOAM/flameD/data/smooke.cti"
+        # gas = ct.Solution(reaction_mechanism)
+        gas = cls.gas
+        # Y = []
+        # for sp in gas.species_names:
+        #     Y_sp = test[sp + "_Y"]
+        #     Y.append(Y_sp)
+        # Y = np.asarray(Y).reshape(1, -1)
+
+        Y = [test[sp + "_Y"] for sp in gas.species_names]
 
         gas.Y = Y
         gas.TP = test.Temp, ct.one_atm
@@ -52,38 +60,53 @@ def calc_ct(df, gas):
         Hs_dot = np.dot(gas.partial_molar_enthalpies, -gas.net_production_rates)
         T_dot = Hs_dot / (gas.density * gas.cp)
 
-        df = pd.DataFrame()
-        # for sp in species:
-        for sp in gas.species_names:
-            df[sp] = gas[sp].net_production_rates
+        df = np.hstack(
+            [
+                # gas.net_production_rates / gas.molecular_weights,
+                gas.net_production_rates,
+                Hs_dot,
+                # T_dot,
+                test.Temp,
+                gas.mix_diff_coeffs[0],
+                gas.density,
+                test["x"],
+                test["y"],
+            ]
+        )
 
-        df["Hs"] = Hs_dot
-        df["Temp"] = T_dot
-
-        df["thermo:Df"] = gas.mix_diff_coeffs[0]
-
-        df["x"] = test["x"]
-        df["y"] = test["y"]
         return df
 
-    with mp.Pool() as pool:
-        rows = [row for _, row in df.iterrows()]
-        raw = pool.map(ct_calc, rows)
+    @classmethod
+    def column_names(cls):
+        column_names = [
+            *cls.gas.species_names,
+            "Hs",
+            "Temp",
+            "thermo:Df",
+            "rho",
+            "x",
+            "y",
+        ]
+        return column_names
 
-    df_ct = pd.concat(raw)
-    df_ct = df_ct.sort_values(["y", "x"], axis=0, ascending=[True, False])
-    return df_ct
+    @classmethod
+    def wdot(cls, df_plane):
+        with mp.Pool() as pool:
+            rows = [row for _, row in df_plane.iterrows()]
+            raw = pool.map(cls.ct_calc, rows)
+        df_ct = pd.DataFrame(np.vstack(raw), columns=cls.column_names())
+        df_ct = df_ct.sort_values(["y", "x"], axis=0, ascending=[True, False])
+
+        return df_ct
 
 
 def euler_pred(df, gas, model_file=""):
-    # model_file = "eulerModel_sk_02new.h5"
-    *input_species, _ = gas.species_names
+
     # input_species = gas.species_names
     # input_features = input_species + ["Hs", "Temp", "dt"]
-    # model = tf.keras.models.load_model("eulerModel_wHs.h5")
+    *input_species, _ = gas.species_names
     input_features = input_species + ["Temp", "dt"]
-    # model = tf.keras.models.load_model("eulerModel_sk_04.h5")
-    # model = tf.keras.models.load_model("eulerModel_sk_02.h5")
+
     model = tf.keras.models.load_model(model_file)
 
     pred = model.predict(df[input_features], batch_size=1024 * 8)
@@ -91,6 +114,5 @@ def euler_pred(df, gas, model_file=""):
     # df_dnn = pd.DataFrame(pred, columns=input_species + ["Hs", "Temp"])
     df_dnn = pd.DataFrame(pred, columns=input_species + ["Temp"])
 
-    df_dnn["x"] = df["x"]
-    df_dnn["y"] = df["y"]
+    df_dnn[["x", "y"]] = df[["x", "y"]]
     return df_dnn
