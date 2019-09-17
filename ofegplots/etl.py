@@ -23,6 +23,8 @@ def read_of(xy, gas):
     df["Hs"] = fields["hs"]
     df["Temp"] = fields["T"]
     df["rho"] = fields["rho"]
+    df["pd"] = fields["pd"]
+    df["p"] = fields["p"]
 
     df["dt"] = 1e-6
 
@@ -41,21 +43,13 @@ class ct_chem:
 
     @classmethod
     def ct_calc(cls, test):
-        # *test, gas = data_in
-        # reaction_mechanism = "/home/edison/OpenFOAM/flameD/data/smooke.cti"
-        # gas = ct.Solution(reaction_mechanism)
         gas = cls.gas
-        # Y = []
-        # for sp in gas.species_names:
-        #     Y_sp = test[sp + "_Y"]
-        #     Y.append(Y_sp)
-        # Y = np.asarray(Y).reshape(1, -1)
+        gas.transport_model = "UnityLewis"
 
         Y = [test[sp + "_Y"] for sp in gas.species_names]
-
         gas.Y = Y
-        gas.TP = test.Temp, ct.one_atm
-        gas.transport_model = "UnityLewis"
+        # gas.TP = test["Temp"], ct.one_atm
+        gas.TP = test["Temp"], test["pd"]
 
         Hs_dot = np.dot(gas.partial_molar_enthalpies, -gas.net_production_rates)
         T_dot = Hs_dot / (gas.density * gas.cp)
@@ -65,8 +59,8 @@ class ct_chem:
                 # gas.net_production_rates / gas.molecular_weights,
                 gas.net_production_rates,
                 Hs_dot,
-                # T_dot,
-                test.Temp,
+                T_dot,
+                # test.Temp,
                 gas.mix_diff_coeffs[0],
                 gas.density,
                 test["x"],

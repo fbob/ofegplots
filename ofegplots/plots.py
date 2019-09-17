@@ -9,12 +9,14 @@ def plot_compare(
     sp="CH4", d=7.2e-3, df_u=df_plane, df_b=df_plane, case="up:xx|bottom:yy"
 ):
     fig, axes = plt.subplots(2, 1)
-
+    sp_range = df_u[sp].max() - df_u[sp].min()
     cb = axes[0].contourf(
         df_u["x"].values.reshape(len(set(df_u["y"])), len(set(df_u["x"]))) / d,
         df_u["y"].values.reshape(len(set(df_u["y"])), len(set(df_u["x"]))) / d,
         df_u[sp].values.reshape(len(set(df_u["y"])), len(set(df_u["x"]))),
-        levels=np.linspace(df_u[sp].min(), df_u[sp].max(), 100),
+        levels=np.linspace(
+            df_u[sp].min() - 0.1 * sp_range, df_u[sp].min() + 1.1 * sp_range, 100
+        ),
     )
     axes[0].set_aspect("equal")
     axes[1].set_aspect("equal")
@@ -31,11 +33,14 @@ def plot_compare(
 
 def plot_single(sp="CH4", df=df_plane, d=7.2e-3, case="defaut"):
     # case = [name for name in globals() if globals()[name] is df]
+    sp_range = df[sp].max() - df[sp].min()
     plt.contourf(
         df["x"].values.reshape(len(set(df["y"])), len(set(df["x"]))) / d,
         df["y"].values.reshape(len(set(df["y"])), len(set(df["x"]))) / d,
         df[sp].values.reshape(len(set(df["y"])), len(set(df["x"]))),
-        levels=np.linspace(df[sp].min(), df[sp].max(), 100),
+        levels=np.linspace(
+            df[sp].min() - 0.1 * sp_range, df[sp].min() + 1.1 * sp_range, 100
+        ),
     )
     plt.colorbar()
     plt.axes().set_aspect("equal")
