@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="ofegplots",
-    version="0.0.9",
+    version="0.0.10 ",
     author="Y.Ge",
     author_email="y.ge1222@gmail.com",
     description="OpenFOAM postprocessing using pyvista and matplotlib",
