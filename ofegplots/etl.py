@@ -52,19 +52,25 @@ class ct_chem:
     def ct_calc(cls, test):
         gas = cls.gas
         gas.transport_model = "UnityLewis"
+        print("new")
+        if test["Temp"] > 800:
+            Y = [test[sp + "_Y"] for sp in gas.species_names]
+            gas.Y = Y
+            # gas.TP = test["Temp"], ct.one_atm
+            gas.TP = test["Temp"], test["pd"]
 
-        Y = [test[sp + "_Y"] for sp in gas.species_names]
-        gas.Y = Y
-        # gas.TP = test["Temp"], ct.one_atm
-        gas.TP = test["Temp"], test["pd"]
-
-        Hs_dot = np.dot(gas.partial_molar_enthalpies, -gas.net_production_rates)
-        T_dot = Hs_dot / (gas.density * gas.cp)
+            w_dot = gas.net_production_rates
+            Hs_dot = np.dot(gas.partial_molar_enthalpies, -gas.net_production_rates)
+            T_dot = Hs_dot / (gas.density * gas.cp)
+        else:
+            w_dot = np.zeros(len(gas.species_names))
+            Hs_dot = 0
+            T_dot = 0
 
         df = np.hstack(
             [
                 # gas.net_production_rates / gas.molecular_weights,
-                gas.net_production_rates,
+                w_dot,
                 Hs_dot,
                 T_dot,
                 # test.Temp,
