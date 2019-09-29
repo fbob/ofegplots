@@ -28,7 +28,8 @@ def plot_compare(
         levels=cb.levels,
     )
     fig.colorbar(cb, ax=axes.flat)
-    plt.show()
+    # plt.show()
+    plt.savefig(sp + ".png")
 
 
 def plot_single(sp="CH4", df=df_plane, d=7.2e-3, case="defaut"):
