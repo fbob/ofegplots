@@ -24,13 +24,17 @@ def read_of(xy, gas, plane="xy"):
     df["Hs"] = fields["hs"]
     df["Temp"] = fields["T"]
     df["rho"] = fields["rho"]
-    # df["pd"] = fields["pd"]
-    df["f"] = fields["f_Bilger"]
     df["p"] = fields["p"]
+    # df["pd"] = fields["pd"]
+
+    if "f_Bilger" in xy.scalar_names:
+        df["f"] = fields["f_Bilger"]
 
     df["dt"] = 1e-6
-
     df["thermo:Df"] = fields["thermo:Df"]
+
+    if "Dft" in xy.scalar_names:
+        df["Dft"] = fields["Dft"]
 
     if plane == "xy":
         df["x"] = np.around(pts[:, 0], decimals=5)
@@ -109,9 +113,9 @@ class ct_chem:
 
 def euler_pred(df, gas, model_file=""):
 
-    # input_species = gas.species_names
+    input_species = gas.species_names
     # input_features = input_species + ["Hs", "Temp", "dt"]
-    *input_species, _ = gas.species_names
+    # *input_species, _ = gas.species_names
     # input_species = gas.species_names
     input_features = input_species + ["Temp", "dt"]
 
@@ -127,7 +131,8 @@ def euler_pred(df, gas, model_file=""):
 
 
 def euler_pred_grid(grid, gas, model_file=""):
-    *input_species, _ = gas.species_names
+    input_species = gas.species_names
+    # *input_species, _ = gas.species_names
     input_features = input_species + ["Temp", "dt"]
     dt = 1e-8
     grid_out = grid.copy()
