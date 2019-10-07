@@ -56,7 +56,7 @@ class ct_chem:
     def ct_calc(cls, test):
         gas = cls.gas
         gas.transport_model = "UnityLewis"
-        print("new")
+
         if test["Temp"] > 800:
             Y = [test[sp + "_Y"] for sp in gas.species_names]
             gas.Y = Y
